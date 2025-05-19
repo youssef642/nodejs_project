@@ -1,26 +1,26 @@
 const express = require("express");
 const morgan = require("morgan");
 const connectDB = require("./config/db");
-const authRoutes = require("./routes/auth");
-const dashboardRoutes = require("./routes/dashboard");
-const userRoutes = require("./routes/users");
-const productRoutes = require("./routes/products");
-const categoryRoutes = require("./routes/categories");
-const orderRoutes = require("./routes/orders");
-const paymentRoutes = require("./routes/payments");
-const reviewRoutes = require("./routes/reviews");
+const authRoutes = require("./routes/admin/auth");
+const dashboardRoutes = require("./routes/admin/dashboard");
+const userRoutes = require("./routes/admin/users");
+const productRoutes = require("./routes/admin/products");
+const categoryRoutes = require("./routes/admin/categories");
+const orderRoutes = require("./routes/admin/orders");
+const paymentRoutes = require("./routes/admin/payments");
+const reviewRoutes = require("./routes/admin/reviews");
 const errorHandler = require("./middleware/errorHandler");
+require("dotenv").config();
+
 
 const app = express();
 
-// Middleware
+
 app.use(morgan("dev"));
 app.use(express.json());
 
-// Connect to MongoDB
 connectDB();
 
-// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/users", userRoutes);
