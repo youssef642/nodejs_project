@@ -24,7 +24,6 @@ router.post(
   }
 );
 
-// Get all categories
 router.get(
   "/",
   verifyToken,
@@ -32,7 +31,6 @@ router.get(
   productController.getAllCategories
 );
 
-// Get a single category by ID
 router.get(
   "/:id",
   verifyToken,
