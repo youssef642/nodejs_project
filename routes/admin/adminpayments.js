@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const paymentController = require("../../controllers/admin/paymentController");
-const { verifyToken, restrictTo } = require("../../middleware/auth");
+const { verifyToken, restrictTo } = require("../../middlewares/auth");
 const { body, validationResult } = require("express-validator");
 
 router.post(

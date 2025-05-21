@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const dashboardController = require("../../controllers/admin/dashboardController");
-const { verifyToken, restrictTo } = require("../../middleware/auth");
+const { verifyToken, restrictTo } = require("../../middlewares/auth");
 
 router.get(
   "/stats",

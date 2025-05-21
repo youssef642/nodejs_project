@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const authController = require("../../controllers/admin/authController");
-const { verifyToken, restrictTo } = require("../../middleware/auth"); 
+const { verifyToken, restrictTo } = require("../../middlewares/auth"); 
 
 router.post(
   "/register",

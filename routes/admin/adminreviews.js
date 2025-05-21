@@ -1,38 +1,34 @@
 const express = require("express");
 const router = express.Router();
-const orderController = require("../../controllers/admin/orderController");
-const { verifyToken, restrictTo } = require("../../middleware/auth");
+const reviewController = require("../../controllers/admin/reviewController");
+const { verifyToken, restrictTo } = require("../../middlewares/auth");
 const { body, validationResult } = require("express-validator"); 
 
 router.get(
   "/",
   verifyToken,
   restrictTo("admin", "manager"),
-  orderController.getAllOrders
+  reviewController.getAllReviews
 );
 
 router.put(
-  "/:id/status",
+  "/:id/reply",
   verifyToken,
   restrictTo("admin", "manager"),
-  [
-    body("status")
-      .isIn(["processing", "shipped", "delivered", "cancelled"])
-      .withMessage("Invalid status"),
-  ],
+  [body("reply").notEmpty().withMessage("Reply is required")],
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
-    orderController.updateOrderStatus(req, res, next);
+    reviewController.replyToReview(req, res, next);
   }
 );
 
-router.get(
-  "/report",
+router.delete(
+  "/:id",
   verifyToken,
-  restrictTo("admin"),
-  orderController.generateOrderReport
+  restrictTo("admin", "manager"),
+  reviewController.deleteReview
 );
 
 module.exports = router;
