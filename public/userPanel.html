@@ -1,0 +1,387 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>User Panel</title>
+<style>
+  :root {
+    --primary: #378fca;
+    --light-bg: #f9f9f9;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --border: #e5e7eb;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-dark);
+    margin: 0;
+    padding: 20px;
+    max-width: 1000px;
+    margin: auto;
+  }
+
+  h1, h2, h3 {
+    color: var(--primary);
+  }
+
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+
+  nav button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  nav button:hover {
+    background-color: #1fbebe;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  section {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  th, td {
+    border: 1px solid var(--border);
+    padding: 10px;
+    text-align: left;
+  }
+
+  label {
+    margin-top: 15px;
+    display: block;
+    font-weight: 600;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background-color: #fff;
+  }
+
+  button[type="submit"], #searchBtn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  button[type="submit"]:hover, #searchBtn:hover {
+    background-color: #3730a3;
+  }
+
+  #suggestions {
+    border: 1px solid var(--border);
+    background: white;
+    position: absolute;
+    z-index: 10;
+    max-width: 300px;
+    width: 100%;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+
+  #suggestions div {
+    padding: 10px;
+    cursor: pointer;
+  }
+
+  #suggestions div:hover {
+    background: var(--light-bg);
+  }
+
+  #results {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  #results li {
+    padding: 10px;
+    background-color: var(--light-bg);
+    border: 1px solid var(--border);
+    margin-top: 10px;
+    border-radius: 6px;
+  }
+
+  .review {
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+  }
+
+  .review strong {
+    color: var(--text-dark);
+  }
+
+  .review small {
+    color: var(--text-light);
+  }
+</style>
+</head>
+<body>
+
+<h1>User Panel</h1>
+
+<nav>
+  <button id="btn-orders">Order History</button>
+  <button id="btn-reviews">Ratings & Reviews</button>
+  <button id="btn-search">Search Products</button>
+</nav>
+
+<section id="orders-section" class="hidden">
+  <h2>Order History</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Date</th>
+        <th>Total Amount</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="orders-tbody"></tbody>
+  </table>
+</section>
+
+<section id="reviews-section" class="hidden">
+  <h2>Submit Review</h2>
+  <form id="review-form">
+    <label for="product-id">Product ID:</label>
+    <input type="number" id="product-id" name="product_id" required />
+
+    <label for="rating">Rating (1-5):</label>
+    <select id="rating" name="rating" required>
+      <option value="">Select rating</option>
+      <option value="1">1 - Poor</option>
+      <option value="2">2 - Fair</option>
+      <option value="3">3 - Good</option>
+      <option value="4">4 - Very Good</option>
+      <option value="5">5 - Excellent</option>
+    </select>
+
+    <label for="comment">Comment:</label>
+    <textarea id="comment" name="comment" rows="4" required></textarea>
+
+    <button type="submit">Submit Review</button>
+  </form>
+
+  <h3>User Feedback</h3>
+  <div id="reviews-list"></div>
+</section>
+
+<section id="search-section" class="hidden" style="position: relative;">
+  <h2>Search Products</h2>
+  <input type="text" id="searchInput" autocomplete="off" placeholder="Start typing..." />
+  <div id="suggestions"></div>
+  <button id="searchBtn">Search</button>
+
+  <h3>Results:</h3>
+  <ul id="results"></ul>
+</section>
+
+<script>
+  // Switch between sections
+  const btnOrders = document.getElementById('btn-orders');
+  const btnReviews = document.getElementById('btn-reviews');
+  const btnSearch = document.getElementById('btn-search');
+
+  const ordersSection = document.getElementById('orders-section');
+  const reviewsSection = document.getElementById('reviews-section');
+  const searchSection = document.getElementById('search-section');
+
+  function showSection(section) {
+    ordersSection.classList.add('hidden');
+    reviewsSection.classList.add('hidden');
+    searchSection.classList.add('hidden');
+    section.classList.remove('hidden');
+  }
+
+  btnOrders.addEventListener('click', () => {
+    showSection(ordersSection);
+    loadOrders();
+  });
+
+  btnReviews.addEventListener('click', () => {
+    showSection(reviewsSection);
+    loadReviews();
+  });
+
+  btnSearch.addEventListener('click', () => {
+    showSection(searchSection);
+  });
+
+  // Dummy user ID for testing, replace with real logged-in user id
+  const userId = 1;
+
+  // Load order history
+  function loadOrders() {
+    fetch(`http://localhost:3000/orders/history/${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.getElementById('orders-tbody');
+        tbody.innerHTML = '';
+        if(data.length === 0){
+          tbody.innerHTML = '<tr><td colspan="4">No orders found</td></tr>';
+          return;
+        }
+        data.forEach(order => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${order.order_id}</td>
+            <td>${new Date(order.created_at).toLocaleDateString()}</td>
+            <td>$${order.total_amount.toFixed(2)}</td>
+            <td>${order.status}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(console.error);
+  }
+
+  // Submit review form
+  const reviewForm = document.getElementById('review-form');
+  reviewForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const formData = new FormData(reviewForm);
+    const data = {
+      user_id: userId,
+      product_id: formData.get('product_id'),
+      rating: formData.get('rating'),
+      comment: formData.get('comment'),
+    };
+    fetch('http://localhost:3000/reviews/submit', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    })
+    .then(res => {
+      if(!res.ok) throw new Error('Failed to submit review');
+      alert('Review submitted successfully');
+      reviewForm.reset();
+      loadReviews();
+    })
+    .catch(err => alert(err.message));
+  });
+
+  // Load user feedback
+  function loadReviews() {
+    // For demo, fetch reviews for product_id = 1; adjust as needed
+    fetch('http://localhost:3000/reviews/product/1')
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('reviews-list');
+        container.innerHTML = '';
+        if(data.length === 0){
+          container.innerHTML = '<p>No reviews yet.</p>';
+          return;
+        }
+        data.forEach(r => {
+          const div = document.createElement('div');
+          div.classList.add('review');
+          div.innerHTML = `<strong>${r.name}</strong> - Rating: ${r.rating}/5<br>${r.comment}<br><small>${new Date(r.created_at).toLocaleDateString()}</small>`;
+          container.appendChild(div);
+        });
+      })
+      .catch(console.error);
+  }
+
+  // Search with suggestions
+  const searchInput = document.getElementById('searchInput');
+  const suggestionsDiv = document.getElementById('suggestions');
+  const resultsUl = document.getElementById('results');
+  const searchBtn = document.getElementById('searchBtn');
+
+  let timeoutId;
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim();
+    clearTimeout(timeoutId);
+
+    if (!query) {
+      suggestionsDiv.innerHTML = '';
+      return;
+    }
+
+    timeoutId = setTimeout(() => {
+      fetch(`http://localhost:3000/search/suggestions?keyword=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          suggestionsDiv.innerHTML = '';
+          data.forEach(name => {
+            const div = document.createElement('div');
+            div.textContent = name;
+            div.onclick = () => {
+              searchInput.value = name;
+              suggestionsDiv.innerHTML = '';
+            };
+            suggestionsDiv.appendChild(div);
+          });
+        })
+        .catch(console.error);
+    }, 300);
+  });
+
+  searchBtn.addEventListener('click', () => {
+    const keyword = searchInput.value.trim();
+    if (!keyword) return;
+
+    fetch(`http://localhost:3000/search/products?keyword=${encodeURIComponent(keyword)}`)
+      .then(res => res.json())
+      .then(data => {
+        resultsUl.innerHTML = '';
+        if (data.length === 0) {
+          resultsUl.innerHTML = '<li>No results found</li>';
+          return;
+        }
+        data.forEach(product => {
+          const li = document.createElement('li');
+          li.textContent = `${product.name} - $${product.price.toFixed(2)}`;
+          resultsUl.appendChild(li);
+        });
+      })
+      .catch(console.error);
+  });
+
+  // Show orders section by default
+  showSection(ordersSection);
+  loadOrders();
+</script>
+
+</body>
+</html> 
+
+
+
