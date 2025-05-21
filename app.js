@@ -10,13 +10,13 @@ const categoryRoutes = require("./routes/admin/admincategories.js");
 const orderRoutes = require("./routes/admin/adminorders.js");
 const paymentRoutes = require("./routes/admin/adminpayments.js");
 const reviewRoutes = require("./routes/admin/adminreviews.js");
-const errorHandler = require("./middlewares/errorHandler");
-const authRoutes = require("./routes/user");
-const passwordRoutes = require("./routes/password");
-const userRoutes = require("./routes/user");
-const ordersRouter = require("./routes/orders.js");
-const reviewsRouter = require("./routes/reviews.js");
-const searchRouter = require("./routes/search.js");
+const errorHandler = require("./middlewares/errorHandler.js");
+const userauthRoutes = require("./routes/auth.js");
+const userpasswordRoutes = require("./routes/password.js");
+const useruserRoutes = require("./routes/user.js");
+const userordersRouter = require("./routes/orders.js");
+const userreviewsRouter = require("./routes/reviews.js");
+const usersearchRouter = require("./routes/search.js");
 const app = new express();
 
 app.use(morgan("dev"));
@@ -35,13 +35,13 @@ app.use("/api/adminpayments", paymentRoutes);
 app.use("/api/adminreviews", reviewRoutes);
 
 //user routes
-app.use("/api/auth", authRoutes);
-app.use("/api/password", passwordRoutes);
-app.use("/api/user", userRoutes);
+app.use("/api/auth", userauthRoutes);
+app.use("/api/password", userpasswordRoutes);
+app.use("/api/user", useruserRoutes);
 
-app.use("/orders", ordersRouter);
-app.use("/reviews", reviewsRouter);
-app.use("/search", searchRouter);
+app.use("/orders", userordersRouter);
+app.use("/reviews", userreviewsRouter);
+app.use("/search", usersearchRouter);
 
 app.use(errorHandler);
 
