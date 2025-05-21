@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const connectDB = require("./config/db");
@@ -10,11 +11,8 @@ const orderRoutes = require("./routes/admin/orders");
 const paymentRoutes = require("./routes/admin/payments");
 const reviewRoutes = require("./routes/admin/reviews");
 const errorHandler = require("./middleware/errorHandler");
-require("dotenv").config();
-
 
 const app = express();
-
 
 app.use(morgan("dev"));
 app.use(express.json());
